@@ -1,6 +1,7 @@
 
 // Load products data from the external file
 import { products } from '../data/products.js';
+import { addToCart,updateCartQuantity} from './cart.js';
 
 let htmlContent = '';
 if(products && products.length > 0) {
@@ -26,7 +27,6 @@ if(products && products.length > 0) {
           <div class="product-price">
             ${product.priceCents}
           </div>
-
           <div class="product-quantity-container">
             <select>
               <option selected value="1">1</option>
@@ -49,11 +49,25 @@ if(products && products.length > 0) {
             Added
           </div>
 
-          <button class="add-to-cart-button button-primary">
+          <button class="add-to-cart-button button-primary js-added-to-cart" data-product-id="${product.id}">
             Add to Cart
           </button>
         </div>`
 })
-document.querySelector('.products-grid').innerHTML = htmlContent;
-}
 
+document.querySelector('.products-grid').innerHTML = htmlContent;
+
+document.querySelectorAll('.js-added-to-cart').forEach(button => {
+
+  button.addEventListener('click', () => {
+    console.log('Added to cart');
+    console.log(button);
+
+    const productId = button.dataset.productId;
+
+    addToCart(productId);
+    updateCartQuantity();
+
+  });
+});
+}
