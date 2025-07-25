@@ -99,3 +99,49 @@ select:focus,
 input:focus {
   outline: 2px solid rgb(255, 153, 0);
 }
+
+.no-products{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* center vertically */
+  background: #f8f8f8;
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+/* Force column stacking */
+.no-products {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;  /* <<< THIS makes them vertical */
+  align-items: center;
+  justify-content: center; /* center vertically */
+}
+
+/* Cart icon */
+.no-products-icon {
+  display: block;          /* ensures it's on its own line */
+  font-size: 80px;
+  margin-bottom: 15px;
+  opacity: 0.85;
+}
+
+/* Main heading */
+.no-products-text {
+  display: block;          /* forces new line */
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+/* Smaller description */
+.no-products-subtext {
+  display: block;          /* also on its own line */
+  font-size: 16px;
+  color: #666;
+  max-width: 300px;
+}
+
+
+
