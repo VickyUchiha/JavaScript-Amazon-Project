@@ -2,6 +2,9 @@
 // Load products data from the external file
 import { products } from '../data/products.js';
 import { addToCart,updateCartQuantity} from './cart.js';
+import { cart } from './cart.js';
+import { formatMoney } from '../util/money.js';
+
 
 let htmlContent = '';
 if(products && products.length > 0) {
@@ -25,7 +28,7 @@ if(products && products.length > 0) {
           </div>
 
           <div class="product-price">
-            ${product.priceCents}
+            ${formatMoney(product.priceCents)}
           </div>
           <div class="product-quantity-container">
             <select>
@@ -56,7 +59,7 @@ if(products && products.length > 0) {
 })
 
 document.querySelector('.products-grid').innerHTML = htmlContent;
-
+updateCartQuantity();
 document.querySelectorAll('.js-added-to-cart').forEach(button => {
 
   button.addEventListener('click', () => {
