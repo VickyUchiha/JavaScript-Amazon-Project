@@ -1,4 +1,5 @@
-import { deliveryOptions } from "../util/money.js";
+import { products } from "../data/products.js";
+import { deliveryOptions, formatMoney, orderSummary } from "../util/money.js";
 
 export let cart = JSON.parse(localStorage.getItem("cart")) || [];
 export function addToCart(productId) {
@@ -26,6 +27,8 @@ export function updateCartQuantity() {
 
 export const saveToLocalStorage = () => {
   localStorage.setItem("cart", JSON.stringify(cart));
+  console.log("Cart saved to localStorage:", cart);
+  // updateOrderSummary(cart);
 };
 
 export function deleteCartItem(productId) {
@@ -47,6 +50,7 @@ export function deleteCartItem(productId) {
   cart = newCart;
   saveToLocalStorage();
   updateCartQuantity();
+  updateOrderSummary(cart);
   if (cart.length === 0) {
     NoProductsFound();
   }
@@ -68,10 +72,12 @@ export function updateDeliveryOption(productId, deliveryOptionId) {
   if (matchingItem) {
     matchingItem.deliveryOptionId = deliveryOptionId;
     saveToLocalStorage();
+
     document.querySelector(
       ".js-delivery-option-" + productId + "-" + deliveryOptionId
     ).checked = true;
   }
+  updateOrderSummary(cart);
 }
 
 export function deliveryOptionsHTML(item) {
@@ -103,5 +109,80 @@ export function deliveryOptionsHTML(item) {
                 </div>`;
   });
   console.log(htmlContent);
+  updateOrderSummary(cart);
   return htmlContent;
+}
+
+export function updateOrderSummary(cart) {
+  console.log("jhoh", cart);
+  let totalItems = 0;
+  let totalPrice = 0;
+  let deliveryPrice = 0;
+  let totalPriceWithDelivery = 0;
+  let tax = 0;
+  let totalPriceWithTax = 0;
+
+  if (cart.length > 0) {
+    cart.forEach((item) => {
+      const matchingItem = products.find((p) => p.id === item.productId);
+      totalItems += 1;
+      totalPrice += matchingItem.priceCents * item.quantity;
+      let dPrice = deliveryOptions.find(
+        (option) => option.deliveryOptionsId == item.deliveryOptionId
+      ).price;
+
+      deliveryPrice += dPrice === "Free Shipping" ? 0 : dPrice;
+      console.log("flka", dPrice);
+      console.log("matchingItem", matchingItem);
+      console.log("deliveryPrice", deliveryPrice);
+    });
+    totalPriceWithDelivery = totalPrice + deliveryPrice;
+    tax = totalPriceWithDelivery * 0.1; // Assuming a 10%
+    totalPriceWithTax = totalPriceWithDelivery + tax;
+    orderSummary.totalItems = totalItems;
+    orderSummary.totalPrice = totalPrice;
+    orderSummary.deliveryPrice = deliveryPrice;
+    orderSummary.totalPriceWithDelivery = totalPriceWithDelivery;
+    orderSummary.tax = tax;
+    orderSummary.totalPriceWithTax = totalPriceWithTax;
+  }
+
+  console.log(orderSummary);
+  let htmlContent = `<div class="payment-summary-title">Order Summary</div>
+
+          <div class="payment-summary-row">
+            <div>Items (${totalItems}):</div>
+            <div class="payment-summary-money">${formatMoney(totalPrice)}</div>
+          </div>
+
+          <div class="payment-summary-row">
+            <div>Shipping &amp; handling:</div>
+            <div class="payment-summary-money">$${deliveryPrice}</div>
+          </div>
+
+          <div class="payment-summary-row subtotal-row">
+            <div>Total before tax:</div>
+            <div class="payment-summary-money">${formatMoney(
+              totalPriceWithDelivery
+            )}</div>
+          </div>
+
+          <div class="payment-summary-row">
+            <div>Estimated tax (10%):</div>
+            <div class="payment-summary-money">${formatMoney(tax)}</div>
+          </div>
+
+          <div class="payment-summary-row total-row">
+            <div>Order total:</div>
+            <div class="payment-summary-money">${formatMoney(
+              totalPriceWithTax
+            )}</div>
+          </div>
+
+          <button class="place-order-button button-primary js-place-order-button">
+            Place your order
+          </button>`;
+  console.log("jkhfh", document.querySelector(".payment-summary").innerHTML);
+
+  document.querySelector(".js-payment-summary").innerHTML = htmlContent;
 }

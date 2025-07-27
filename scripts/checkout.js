@@ -7,11 +7,13 @@ import {
   NoProductsFound,
   deliveryOptionsHTML,
   updateDeliveryOption,
+  updateOrderSummary,
 } from "./cart.js";
 import { formatMoney } from "../util/money.js";
 
 console.log(dayjs().format("dddd, MMMM d"));
-let htmlContent;
+let htmlContent = "";
+updateOrderSummary(cart);
 if (cart && cart.length > 0) {
   cart.forEach((item) => {
     const product = products.find((p) => p.id === item.productId);
@@ -79,6 +81,7 @@ if (cart && cart.length > 0) {
         matchingItem.quantity++;
       }
       updateCartQuantity();
+      updateOrderSummary(cart);
       document.querySelector(".js-quantity-label-" + productId).innerHTML =
         matchingItem.quantity;
     });
